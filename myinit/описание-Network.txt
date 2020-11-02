@@ -1,0 +1,114 @@
+Инит. Network
+
+
+01.
+Получите список сетевых интерфейсов машины, не отображая никаких деталей для этих интерфейсов. Только список имен.
+
+ifconfig -l
+
+02.
+Определите и отобразите характеристики интерфейса Этернет:
+а) определите широковещательный адрес.
+
+1вариант:
+ifconfig en0 | grep 'broadcast ' | awk '{print $6}'
+
+2вариант:
+ifconfig en0 | grep 'iinet ' | awk '{print $6}'
+
+б) определите все IP-адреса, кот. являются частью одной подсети.
+
+arp -a | awk '{print $2}' | sed 's/(//' | sed 's/)//'
+
+
+03.
+Определите MAC-адрес карты wi-fi.
+
+1вариант:
+ifconfig en1 | grep ether | awk '{print $2}'
+
+2вариант:
+networksetup -getmacaddress en1 | cut -d ' ' -f3
+
+3вариант:
+networksetup -getmacaddress en1 | cut -c 19-35
+
+
+04.
+Определите шлюз по умолчанию в таблице маршрутизации.
+
+1вариант:
+netstat -rn | grep default
+
+2вариант:
+netstat -r -n | grep default | head -1 | awk '{print $2}'
+
+
+05.
+Определите IP-адрес DNS, к-рый отвечает на следующий URL: slash16.org.
+
+1вариант:
+host slash16.org | grep 'has address' | awk '{print $4}'
+
+2вариант:
+nslookup slash16.org | grep Address: | awk '{print $2}'
+
+3вариант:
+ping slash16.org -c1 | grep 'bytes from' |  awk '{print $4}' | awk -F ':' '{print $1}'
+
+4вариант:
+nslookup slash16.org | grep Server | cut -c 10-
+
+
+06.
+Получите полный путь к файлу, к-рый содержит IP-адрес используемого вами DNS-сервера.
+
+/etc/resolv.conf
+
+
+07.
+Запросить внешний DNS-сервер по доменному имени slash16.org (t.e. google 8.8.8.8).
+
+nslookup slash16.org 8.8.8.8
+
+08.
+Найти провайдера slash16.org.
+
+whois 13.32.42.73
+
+09.
+Найти внешний IP 42.fr.
+
+host 42.fr 8.8.8.8 | grep 'has address' | awk '{print $4}'
+
+10.
+Определите сетевые устройства между вашим компьютером и доменом slash16.org.
+
+traceroute slash16.org
+
+11.
+Используйте выходные данные предыдущей команды, чтобы найти имя и IP-адрес устройства, к-рое устанавливает связь вами(локальной сетью) и внешним миром.
+
+ traceroute slash16.org | grep ' 1 ' | awk '{print $2 "\t" $3}'
+
+12.
+Найдите IP-адрес, кот-й назначен вам сервером DHCP.
+
+1вариант:
+ifconfig en0 | grep 'inet ' | awk '{print $2}'
+
+2вариант:для МАКов
+ipconfig getpacket en0 | grep server_identifier | sed 's/[^0-9]*//'
+
+13.
+Благодаря предыдущему вопросу и обратному DNS, найдите имя вашего хоста.
+
+14.
+Какой файл содержит локальные записи DNS?
+
+/etc/hosts
+
+15.
+Сделать адрес intra.42.fr перенаправленным на 46.19.122.85
+
+echo "46.19.122.85     intra.42.fr" >> /etc/hosts
